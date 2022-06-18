@@ -1,27 +1,27 @@
-% ‰Šú‰»
+% åˆæœŸåŒ–
 clearvars;
 
-% ƒpƒ‰ƒ[ƒ^[
-Lx = 4;% ŒvŽZ—Ìˆæ
-dLx = 0.1;% —v‘fƒTƒCƒY
-dt = 0.05;
-nx = Lx / dLx + 1;% —v‘f”
-c = 1;% ˆÚ—¬‘¬“x
+% ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
+Lx = 4;% è¨ˆç®—é ˜åŸŸ
+dLx = 0.01;% è¦ç´ ã‚µã‚¤ã‚º
+dt = 0.005;
+nx = Lx / dLx + 1;% è¦ç´ æ•°
+c = 1;% ç§»æµé€Ÿåº¦
 t_max = 3;
 iter_max = t_max / dt;
-dt_pos = 0.2;% ‰æ‘œo—ÍŠÔŠu
+dt_pos = 0.02;% ç”»åƒå‡ºåŠ›é–“éš”
 
-% ƒN[ƒ‰ƒ“”
+% ã‚¯ãƒ¼ãƒ©ãƒ³æ•°
 nu = c * dt / dLx;
 
-% À•W‚Ì¶¬
+% åº§æ¨™ã®ç”Ÿæˆ
 x = 0 : dLx : Lx;
 
-% ”z—ñŠm•Û
+% é…åˆ—ç¢ºä¿
 q_exact = zeros(nx, 1);
 q = zeros(nx, 1);
 
-% ‰ŠúðŒ‚ÌÝ’è
+% åˆæœŸæ¡ä»¶ã®è¨­å®š
 for i =  1 : nx
 
     if abs(x(i) - 1) <= 10^-6
@@ -37,17 +37,21 @@ for i =  1 : nx
 
 end
 
-% ˆÚ—¬ƒXƒL[ƒ€‚Ì‘I‘ð
-method = '1st order UDS';% 1ŽŸ¸“x•—ã·•ª–@
-%method = '2nd order CDS';% 2ŽŸ¸“x’†S·•ª–@
+% ç§»æµã‚¹ã‚­ãƒ¼ãƒ ã®é¸æŠž
+method = '1st order UDS';% 1æ¬¡ç²¾åº¦é¢¨ä¸Šå·®åˆ†æ³•
+%method = '2nd order CDS';% 2æ¬¡ç²¾åº¦ä¸­å¿ƒå·®åˆ†æ³•
+%method = '2nd order UDS';% 2æ¬¡ç²¾åº¦é¢¨ä¸Šå·®åˆ†æ³•
+%method = 'Lax-Friedrich';% Lax-Friedrichæ³•
+%method = 'Lax-Wendroff';% Lax-Wendroffæ³•
 
-% ŽžŠÔ”­“W
+
+% æ™‚é–“ç™ºå±•
 for iter = 1 : iter_max
 
     time = iter * dt;
     q_old = q;
 
-    % ‰ðÍ‰ð
+    % è§£æžè§£
     for i = 1 : nx
         if abs(x(i) - (1 + c * time)) < 10^-6
             q_exact(i) = 1;
@@ -58,31 +62,60 @@ for iter = 1 : iter_max
         end
     end
 
-    % ”’l‰ð
-    for i = 2 : nx - 1 % ‹«ŠE—v‘f‚ÍŒÅ’è‚Æ‚µ‚ÄŒvŽZ‚Í”ò‚Î‚·B
-        switch method
+    % æ•°å€¤è§£
+    switch method
 
-            case '1st order UDS'
+        case '1st order UDS'
 
-                q(i) = q_old(i) - nu * (q_old(i) - q_old(i - 1));% 1ŽŸ¸“x•—ã·•ª
+            for i = 2 : nx
 
+                q(i) = q_old(i) - nu * (q_old(i) - q_old(i - 1));% 1æ¬¡ç²¾åº¦é¢¨ä¸Šå·®åˆ†
 
-            case '2nd order CDS'
+            end
 
-                q(i) = q_old(i) - 0.5 * nu * (q_old(i + 1) - q_old(i - 1));% 2ŽŸ¸“x’†S·•ª
+        case '2nd order CDS'
 
-            otherwise
+            for i = 2 : nx - 1
+                q(i) = q_old(i) - 0.5 * nu * (q_old(i + 1) - q_old(i - 1));% 2æ¬¡ç²¾åº¦ä¸­å¿ƒå·®åˆ†
+            end
+            q(nx) = q(nx - 1);
 
-                error("‘I‘ð‚³‚ê‚½Žè–@F" + method + "‚ÍƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢‚Å‚·B" + ...
-                    "1st order UDS, 2nd order CDS‚©‚ç‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢B");
-        end
+        case '2nd order UDS'
+
+            for i = 3 : nx
+                q(i) = q_old(i) - 0.5 * nu * (3 * q_old(i) - 4 * q_old(i - 1) + q_old(i - 2));% 2æ¬¡ç²¾åº¦ä¸­å¿ƒå·®åˆ†
+            end
+
+        case '3rd order UDS'
+
+            for i = 3 : nx - 1
+                q(i) = q_old(i) -  nu * (2 * q_old(i + 1) + 3 * q_old(i) - 6 * q_old(i - 1) + q_old(i - 2)) / 6; % 3æ¬¡ç²¾åº¦ä¸­å¿ƒå·®åˆ†
+            end
+
+        case 'Lax-Friedrich'
+
+            for i = 2 : nx - 1
+                q(i) = 0.5 * (q_old(i + 1) + q_old(i - 1)) - 0.5 * nu * (q_old(i + 1) - q_old(i - 1));% Lax-Friedric
+            end
+            q(nx) = q(nx - 1);
+
+        case 'Lax-Wendroff'
+
+            for i = 2 : nx - 1
+                q(i) = q_old(i) - 0.5 * nu * (q_old(i + 1) - q_old(i - 1)) + 0.5 * nu^2 * (q_old(i + 1) - 2 * q_old(i) + q_old(i - 1));% 2æ¬¡ç²¾åº¦ä¸­å¿ƒå·®åˆ†
+            end
+            q(nx) = q(nx - 1);
+
+        otherwise
+
+            error("é¸æŠžã•ã‚ŒãŸæ‰‹æ³•ï¼š" + method + "ã¯ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„ã§ã™ã€‚" );
     end
 
-    % ƒRƒ}ƒ“ƒhƒEƒBƒ“ƒhƒE‚Ö‚Ìo—Í
+    % ã‚³ãƒžãƒ³ãƒ‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¸ã®å‡ºåŠ›
     txt = ['iter = ', num2str(iter), ' / ', num2str(iter_max)];
     disp(txt);
 
-    % ƒŠƒAƒ‹ƒ^ƒCƒ€‰ÂŽ‹‰»
+    % ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ å¯è¦–åŒ–
     filename = [method, ', dt = ', num2str(dt), ', dx = ', num2str(dLx),', c = ', num2str(c),', nu = ', num2str(nu),'.gif'];
     fignum = 1;
     plot(x, q_exact, x, q)
@@ -92,7 +125,7 @@ for iter = 1 : iter_max
     fig=gcf;
     fig.Color='white';
     xlim([0 4]);
-    ylim([0 1.5]);
+    ylim([-1 2]);
     xlabel('x')
     ylabel('q')
 
@@ -104,9 +137,9 @@ for iter = 1 : iter_max
     im = frame2im(frame);
     [imind, cm] = rgb2ind(im, 256);
     if time == dt_pos
-        imwrite(imind, cm, filename, 'gif', 'DelayTime', 0.2, 'Loopcount', inf);
+        imwrite(imind, cm, filename, 'gif', 'DelayTime', 0.05, 'Loopcount', inf);
     elseif rem(time, dt_pos) == 0
-        imwrite(imind, cm, filename, 'gif', 'DelayTime', 0.2, 'WriteMode', 'append');
+        imwrite(imind, cm, filename, 'gif', 'DelayTime', 0.05, 'WriteMode', 'append');
     end
 
 end
