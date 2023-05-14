@@ -1,8 +1,7 @@
 ## 1Dadvection
 
-・This program solves the one-dimensional advection equation.  
-・Simulations are performed in both preserved and non-preserved formats, and the results are compared.
-・A first-order precision upwind-difference method is used for discretization.
+・This program solves the one-dimensional advection equation.
+・upwind difference schem/central differencing scheme / 2nd order upwind difference schem/Lax-Friedrich method/Lax-Wendroff method
 
 ## demo
 ・q  
