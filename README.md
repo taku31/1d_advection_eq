@@ -5,7 +5,7 @@
 
 ## demo
 ・q  
-![](movie/nonvisco_burgers_1d.mp4)  
+![](img/demo.gif)  
 
 ## Author
 T.Nakabayashi
